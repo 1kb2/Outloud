@@ -111,7 +111,6 @@ Outloud differs fundamentally from all three categories, no malicious content is
 
 ---
 
-//////////////////////////////////////////////////
 ## 6.0 Detection, Mitigation & Expansion
 
 ### 6.1 Blue Team Perspective
@@ -139,7 +138,7 @@ Outloud differs fundamentally from all three categories, no malicious content is
 - Polling loop implementation for autonomous receiver
 - Operational security considerations
 - Detection evasion beyond human sleep intervals
-//////////////////////////////////////////////////
+
 
 ---
 
