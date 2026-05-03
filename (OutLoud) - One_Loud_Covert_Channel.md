@@ -1,6 +1,17 @@
  A steganographic data transmission system exploiting Spotify playlist track ordering
 
 ---
+
+**Contributors**
+
+| Handle | Role                                |
+| ------ | ----------------------------------- |
+| - | - |
+| - | - |
+| - | - |
+
+---
+
 ## 1.0 Abstract
 
 ### 1.1 Overview
@@ -95,11 +106,13 @@ Outloud differs fundamentally from all three categories, no malicious content is
 ### 3.4 Channel capacity analysis
 
 ---
+
 ## 4.0 Implementation
 
 ### 4.1 Receiver: zero-auth HTML meta tag scraping
 ### 4.2 Sender: internal GraphQL API reverse engineering
 ### 4.3 Human sleep intervals for evasion
+
 ---
 
 ## 5.0 Findings
@@ -107,19 +120,21 @@ Outloud differs fundamentally from all three categories, no malicious content is
 ### 5.1 Spotify embeds all track URIs in public HTML
 ### 5.2 client-token is not account-bound
 ### 5.3 Bearer token required for writes only
-### 5.4 Rate limiting observed during testing
+### 5.4 No rate limiting observed during testing
 
 ---
 
 ## 6.0 Detection, Mitigation & Expansion
 
 ### 6.1 Blue Team Perspective
+
 - What does Outloud traffic look like from a defender's point of view
 - Does it appear in proxy/firewall logs
 - Is the playlist fetch distinguishable from normal Spotify usage
 - What artifacts does the sender leave behind
 
 ### 6.2 What Would Trigger a SIEM
+
 - Behavioral indicators — repeated playlist fetches at regular intervals
 - Volume anomalies — unusually frequent calls to open.spotify.com
 - Process anomalies — non-browser processes making requests to Spotify
@@ -127,19 +142,19 @@ Outloud differs fundamentally from all three categories, no malicious content is
 - Why most SIEMs would miss this entirely
 
 ### 6.3 How Spotify Could Detect/Prevent This
+
 - Rate limiting track additions per session
 - Anomaly detection on playlist modification frequency
 - Flagging playlists where tracks are added and removed in rapid succession
 - Whether Open Graph meta tags could be gated behind auth
 
 ### 6.4 Red Team Expansion
+
 - Using Outloud as a dead drop for operator instructions
 - Fileless persistence integration
 - Polling loop implementation for autonomous receiver
 - Operational security considerations
 - Detection evasion beyond human sleep intervals
-
-
 ---
 
 ## 7.0 Conclusion
@@ -148,7 +163,7 @@ Outloud differs fundamentally from all three categories, no malicious content is
 
 ## References
 
-[1] Taylor & Francis Knowledge Hub Page on Covert Channels, https://taylorandfrancis.com/knowledge/Engineering_and_technology/Computer_science/Covert_channels/
+[1] Taylor & Francis _Knowledge Hub Page on Covert Channels_, https://taylorandfrancis.com/knowledge/Engineering_and_technology/Computer_science/Covert_channels/
 
 [2] Wray, J. C. (1991). "An Analysis of Covert Timing Channels." _Proceedings of the IEEE Symposium on Research in Security and Privacy_, 313–323. Oakland, CA, https://www.cs.cornell.edu/people/vickyw/iFlow/papers/wra91.pdf
 
@@ -156,16 +171,16 @@ Outloud differs fundamentally from all three categories, no malicious content is
 
 [4] Spotify, "Company Info", https://newsroom.spotify.com/company-info/
 
-[5] Fridrich, J. (2009). Steganography in Digital Media: Principles, Algorithms, and Applications. Cambridge University Press, https://books.google.it/books?id=wcAZ-QEthqkC&printsec=frontcover#v=onepage&q&f=false
+[5] Fridrich, J. (2009). _Steganography in Digital Media: Principles, Algorithms, and Applications. Cambridge University Press_, https://books.google.it/books?id=wcAZ-QEthqkC&printsec=frontcover#v=onepage&q&f=false
 
-[6] Schneier, B. (2000). Secrets and Lies: Digital Security in a Networked World. Wiley. page 344, https://archive.org/details/secretsliesdigit0000schn/
+[6] Schneier, B. (2000). _Secrets and Lies: Digital Security in a Networked World. Wiley. page 344_, https://archive.org/details/secretsliesdigit0000schn/
 
 [7] Zenarmor. (2023). _Detecting DNS tunneling attacks_, https://www.zenarmor.com/docs/network-security-tutorials/what-is-dns-tunneling
 
 [8] Hromcová, Z. (2019). _Okrum and Ketrican: An overview of recent Ke3chang group activity_ . ESET Research, https://web-assets.esetstatic.com/wls/2019/07/ESET_Okrum_and_Ketrican.pdf
 
-[9] Keshwani, P., Priyanka, R., & Nayak, L. (2018). A Comprehensive Study of Various Techniques of Steganography: A Survey, https://www.ijariit.com/conference-proceedings/28%20CSE%20120.pdf
+[9] Keshwani, P., Priyanka, R., & Nayak, L. (2018). _A Comprehensive Study of Various Techniques of Steganography: A Survey_, https://www.ijariit.com/conference-proceedings/28%20CSE%20120.pdf
 
-[10] Negrat, A. M., & Kumar, A. (2010). Secure Steganography for Audio Signals, https://www.wseas.us/e-library/conferences/2010/Taipei/ISCGAV/ISCGAV-01.pdf
+[10] Negrat, A. M., & Kumar, A. (2010). _Secure Steganography for Audio Signals_, https://www.wseas.us/e-library/conferences/2010/Taipei/ISCGAV/ISCGAV-01.pdf
 
-[11]   MITRE ATT&CK (T1102), https://attack.mitre.org/techniques/T1102/
+[11] MITRE ATT&CK (T1102), https://attack.mitre.org/techniques/T1102/
