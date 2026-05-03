@@ -120,7 +120,7 @@ Outloud differs fundamentally from all three categories, no malicious content is
 ### 5.1 Spotify embeds all track URIs in public HTML
 ### 5.2 client-token is not account-bound
 ### 5.3 Bearer token required for writes only
-### 5.4 No rate limiting observed during testing
+### 5.4 Rate limiting observed during testing
 
 ---
 
