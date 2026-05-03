@@ -108,17 +108,17 @@ Steganography is sometimes conflated with security through obscurity, the flawed
 ## References
 
 [1] Taylor & Francis Knowledge Hub Page on Covert Channels, https://taylorandfrancis.com/knowledge/Engineering_and_technology/Computer_science/Covert_channels/
-|
+
 [2] Wray, J. C. (1991). "An Analysis of Covert Timing Channels." _Proceedings of the IEEE Symposium on Research in Security and Privacy_, 313–323. Oakland, CA, https://www.cs.cornell.edu/people/vickyw/iFlow/papers/wra91.pdf
-|
+
 [3] Lampson, B. W. (1973). "A Note on the Confinement Problem." _Communications of the ACM_, 16(10), 613–615. https://doi.org/10.1145/362375.362389
-|
+
 [4] Spotify, "Company Info", https://newsroom.spotify.com/company-info/
-|
+
 [5] Fridrich, J. (2009). Steganography in Digital Media: Principles, Algorithms, and Applications. Cambridge University Press, https://books.google.it/books?id=wcAZ-QEthqkC&printsec=frontcover#v=onepage&q&f=false
-|
+
 [6] Schneier, B. (2000). Secrets and Lies: Digital Security in a Networked World. Wiley. page 344 https://archive.org/details/secretsliesdigit0000schn/
-|
+
 [7] MITRE ATT&CK (T1102) https://attack.mitre.org/techniques/T1102/
 
 
