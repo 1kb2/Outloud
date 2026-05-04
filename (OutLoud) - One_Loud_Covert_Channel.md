@@ -101,7 +101,7 @@ Social platforms are particularly interesting targets for covert channel impleme
 
 Outloud specifically leverages Spotify because the encoded data is functionally benign at rest (e.g. a playlist of Aphex Twin tracks raises no suspicion to any observer, human or automated, nor does it cause any harm to the platform or its users). The data only becomes meaningful when decoded with knowledge of the sync length, meaning content inspection alone is insufficient to detect the channel.
 
-Unlike attacker-controlled C2 infrastructure, social platforms cannot be blocklisted without significant operational justification. An employee listening to music on Spotify while working is entirely expected behavior.
+Unlike attacker-controlled C2 infrastructure, social platforms cannot be blocklisted without significant operational justification. An employee listening to music on Spotify while working is entirely expected behavior, most organizations simply do not restrict access to streaming services.
 
 ---
 
