@@ -81,7 +81,9 @@ This distinction is critical for Outloud. The channel itself provides no confide
 
 ### 2.2 Existing covert channels 
 
-Covert channels can be broadly grouped into three categories: 
+Covert channels are classified into two fundamental categories: storage channels, which encode information in a persistent readable medium, and timing channels, which encode information in the timing of events [2]. 
+
+Implementations vary widely. Common examples include:
 
 **Network protocol channels** exploit the structure of network protocols to hide data. During the SolarWinds compromise (attributed to APT29/SVR), attackers used DNS subdomain encoding to construct randomized subdomains for C2 communication [7]. Similarly, the Ke3chang/APT15 group's Okrum backdoor employed custom HTTP header steganography using `Cookie` and `Set-Cookie` fields for C2 [8]. 
 
@@ -89,12 +91,17 @@ Covert channels can be broadly grouped into three categories:
 - LSB image embedding conceals data in the least significant bits of pixel values in PNG and JPEG files [9]. 
 - Echo audio steganography embeds data into audio signals by varying the amplitude, decay rate, and offset of introduced echoes [10]. 
 
-**Web service abuse** (MITRE ATT&CK T1102 [11]) stores malicious payloads directly on legitimate platforms such as Dropbox, GitHub, or Pastebin. While these blend into normal traffic, the payload itself remains detectable through content inspection. 
+**Web service abuse** (MITRE ATT&CK T1102 [11]) stores malicious payloads directly on legitimate platforms such as Dropbox, GitHub, or Pastebin. While these blend into normal traffic due to the legitimacy of the hosting platform, the payload itself remains detectable through content inspection.
 
-Outloud differs fundamentally from all three categories, no malicious content is stored anywhere. The message exists only in the semantic ordering of tracks within a normal music playlist, invisible to any content-based detection.
+Outloud differs fundamentally from all of the above, no malicious content is stored anywhere. The message exists only in the semantic ordering of tracks within a normal music playlist, invisible to any content-based detection.
 
 ### 2.3 Why social platforms are interesting targets
 
+Social platforms are particularly interesting targets for covert channel implementation due to the sheer volume of traffic they generate. Connections to platforms like Spotify, Twitter, or Instagram blend seamlessly into baseline network noise, making individual requests statistically invisible to most monitoring tools unless it is excessive.
+
+Outloud specifically leverages Spotify because the encoded data is functionally benign at rest (e.g. a playlist of Aphex Twin tracks raises no suspicion to any observer, human or automated, nor does it cause any harm to the platform or its users). The data only becomes meaningful when decoded with knowledge of the sync length, meaning content inspection alone is insufficient to detect the channel.
+
+Unlike attacker-controlled C2 infrastructure, social platforms cannot be blocklisted without significant operational justification. An employee listening to music on Spotify while working is entirely expected behavior.
 
 ---
 
@@ -120,7 +127,7 @@ Outloud differs fundamentally from all three categories, no malicious content is
 ### 5.1 Spotify embeds all track URIs in public HTML
 ### 5.2 client-token is not account-bound
 ### 5.3 Bearer token required for writes only
-### 5.4 Rate limiting observed during testing
+### 5.4 No rate limiting observed during testing
 
 ---
 
