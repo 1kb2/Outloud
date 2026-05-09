@@ -226,8 +226,7 @@ This makes the sync length function as a lightweight shared secret. While it doe
 
 For a playlist of T total tracks, an interceptor must try every possible `SYNC_LENGTH` from 2 to T-1. Most incorrect values will either produce decoding errors, where message tracks are not found in the codebook, or nonsensical output, making manual verification necessary for each attempt.
 
-Additionally, the ordering of tracks within the sync header itself acts as a 
-secondary key. With `SYNC_LENGTH = 12`, there are:
+Additionally, the ordering of tracks within the sync header itself acts as a secondary key. With `SYNC_LENGTH = 12`, there are:
 
 ```
 
