@@ -1,4 +1,6 @@
- A steganographic data transmission system exploiting Spotify playlist track ordering
+# OutLoud
+
+A steganographic data transmission system exploiting Spotify playlist track ordering
 
 ---
 
@@ -66,6 +68,7 @@ Finally, Spotify's internal GraphQL API accepts write operations such as adding 
 Steganography is the practice of concealing information within ordinary, non-secret data so that the existence of a message goes undetected [5]. 
 
 While steganographic techniques have existed for centuries, the field only developed a formal theoretical foundation in the early 1990s with the rise of digital media and networked communication [5].
+
 ### 2.1 Steganography theory
 
 Unlike cryptography, which protects the content of a message, steganography protects the fact that communication is occurring at all. 
@@ -101,16 +104,136 @@ Social platforms are particularly interesting targets for covert channel impleme
 
 Outloud specifically leverages Spotify because the encoded data is functionally benign at rest (e.g. a playlist of Aphex Twin tracks raises no suspicion to any observer, human or automated, nor does it cause any harm to the platform or its users). The data only becomes meaningful when decoded with knowledge of the sync length, meaning content inspection alone is insufficient to detect the channel.
 
-Unlike attacker-controlled C2 infrastructure, social platforms cannot be blocklisted without significant operational justification. An employee listening to music on Spotify while working is entirely expected behavior, most organizations simply do not restrict access to streaming services.
+Unlike attacker-controlled C2 infrastructure, social platforms cannot be blocklisted without significant operational justification. An employee listening to music on Spotify while working is entirely expected behavior.
 
 ---
 
 ## 3.0 Technical Design
 
-### 3.1 The sync header concept
+### 3.1 The Sync Header Concept
+
+Outloud encodes messages into the ordering of tracks within a Spotify playlist. The playlist is divided into two regions:
+
+- **Sync header**: the first N tracks, where N is the `SYNC_LENGTH`. These tracks define the codebook dynamically, their position in the playlist determines their symbol value. Track at position 1 = symbol 0, position 2 = symbol 1, and so on.
+- **Message region**: all tracks after position N. These tracks encode the actual message using the codebook defined by the sync header.
+
+The sync header serves two purposes. First it establishes the encoding alphabet without any hardcoded values, the codebook is derived entirely from the current state of the playlist. Second, reordering the sync header tracks produces a completely different codebook, effectively changing the encoding key without  modifying any software.
+
+Below is an example playlist with `SYNC_LENGTH = 12`, and the resulting codebook  generated from its sync header:
+
+![Playlist sync header example](OutLoudFigure1.png)
+*Figure 1: Playlist viewed in Spotify — first 12 tracks form the sync header, subsequent tracks encode the message.*
+
+
+![](OutLoudFigure2.png)
+*Figure 2: Codebook generated from sync header of playlist `1Ws2L2kUi8Q5m0yn5lPLqK` with `SYNC_LENGTH = 12`*
+
 ### 3.2 Base-12 encoding
+
+The encoding base is determined directly by the `SYNC_LENGTH` , the number of tracks in the sync header. With `SYNC_LENGTH = 12`, Outloud operates in base-12 by default.
+
+The number of tracks required to represent a single ASCII character (values 0–127) is calculated as:
+
+```
+
+tracks_per_char = ⌈log_N(128)⌉
+
+```
+
+Where N is the base (equal to sync length) and 128 is the size of the ASCII  character space.
+
+#### Why base-12?
+
+Base-12 is the smallest base that achieves full ASCII coverage in exactly 2 tracks per character:
+
+```
+
+11² = 121 < 128 ✗ needs 3 tracks per character
+12² = 144 ≥ 128 ✓ needs 2 tracks per character
+
+```
+
+This makes 12 the optimal choice, it minimizes the sync header size while keeping the encoding at 2 tracks per character.
+
+#### **Example: encoding the letter `w` (ASCII 119) in base-12:**
+
+Encoding:
+```
+
+119 ÷ 12 = 9 remainder 11
+
+digits = [9, 11]
+
+symbol 9 → Ptolemy (23HiOySFOnPUXTJWnc5tAb) 
+symbol 11 → Delphium (54avYgPIdqFI59mW91E0Sf)
+
+```
+
+The letter `w` is encoded by appending Ptolemy followed by Delphium to the playlist after the sync header.
+
+Decoding:
+```
+
+Read track → Ptolemy → symbol 9 
+Read track → Delphium → symbol 11
+
+value = (9 × 12) + 11 = 119
+
+chr(119) = 'w' ✓
+
+```
+
+This is the first character of the message `whoami` currently encoded in the example playlist. 
+See _Figure 1_ above.
+
+**Comparison across different bases:**
+
+| SYNC_LENGTH | Tracks per char | 5-char message | Max capacity* | Looks natural? |
+|-------------|-----------------|----------------|---------------|----------------|
+| 4           | 4               | 20 tracks      | ~2,499 chars  | ✓ very small   |
+| 8           | 3               | 15 tracks      | ~3,330 chars  | ✓ small        |
+| 12          | 2               | 10 tracks      | ~4,994 chars  | ✓ normal       |
+| 16          | 2               | 10 tracks      | ~4,992 chars  | ✓ normal       |
+| 32          | 2               | 10 tracks      | ~4,984 chars  | ~ large        |
+| 64          | 2               | 10 tracks      | ~4,968 chars  | ✗ suspicious   |
+| 128         | 1               | 5 tracks       | ~9,872 chars  | ✗ very large   |
+
+*\*Based on Spotify's 10,000 track playlist limit, minus sync header tracks.* [12]
+
+
+**Limitations:**
+
+- **ASCII only** — the current implementation supports standard ASCII (0–127).  Extended character sets such as UTF-8 would require either a larger base or  more tracks per character.
+- **Playlist size cap** — Spotify limits playlists to 10,000 tracks [12], giving  a theoretical maximum message length of ~4,994 characters at base-12.
+
+> Note: In the current PoC, all sync header tracks are sourced from a single album (Aphex Twin — Selected Ambient Works 85-92) for simplicity. In an operational deployment, tracks would be sourced from multiple artists and genres to better  resemble a genuine user-curated playlist.
+
 ### 3.3 SYNC_LENGTH as shared secret
-### 3.4 Channel capacity analysis
+
+The only value both sender and receiver must agree on in advance is the `SYNC_LENGTH` , a single integer that determines where the sync header ends and the message region begins.
+
+Without knowledge of the sync length, an observer cannot:
+
+- Determine which tracks form the codebook and which encode the message
+- Derive the encoding base
+- Calculate how many tracks represent a single character
+
+This makes the sync length function as a lightweight shared secret. While it does not provide cryptographic security, it introduces a layer of ambiguity, an interceptor who discovers the playlist must still guess or brute-force the correct sync length to decode anything meaningful.
+
+**Keyspace analysis:**
+
+For a playlist of T total tracks, an interceptor must try every possible `SYNC_LENGTH` from 2 to T-1. Most incorrect values will either produce decoding errors, where message tracks are not found in the codebook, or nonsensical output, making manual verification necessary for each attempt.
+
+Additionally, the ordering of tracks within the sync header itself acts as a 
+secondary key. With `SYNC_LENGTH = 12`, there are:
+
+```
+
+12! = 479,001,600 possible codebook permutations
+
+```
+
+>Note: Reordering the same 12 tracks in the sync header produces a completely different codebook without changing the track selection, effectively rekeying the channel by simply rearranging the playlist.
 
 ---
 
@@ -162,6 +285,7 @@ Unlike attacker-controlled C2 infrastructure, social platforms cannot be blockli
 - Polling loop implementation for autonomous receiver
 - Operational security considerations
 - Detection evasion beyond human sleep intervals
+
 ---
 
 ## 7.0 Conclusion
@@ -191,3 +315,5 @@ Unlike attacker-controlled C2 infrastructure, social platforms cannot be blockli
 [10] Negrat, A. M., & Kumar, A. (2010). _Secure Steganography for Audio Signals_, https://www.wseas.us/e-library/conferences/2010/Taipei/ISCGAV/ISCGAV-01.pdf
 
 [11] MITRE ATT&CK (T1102), https://attack.mitre.org/techniques/T1102/
+
+[12] Spotify Community, "Increase Playlist Limit to more than 10,000 songs", https://community.spotify.com/t5/Your-Library/Increase-Playlist-Limit-to-more-than-10-000-songs-please/m-p/5212545#M13836
