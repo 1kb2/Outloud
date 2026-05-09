@@ -122,10 +122,12 @@ The sync header serves two purposes. First it establishes the encoding alphabet 
 Below is an example playlist with `SYNC_LENGTH = 12`, and the resulting codebook  generated from its sync header:
 
 ![Playlist sync header example](OutLoudFigure1.png)
+
 *Figure 1: Playlist viewed in Spotify — first 12 tracks form the sync header, subsequent tracks encode the message.*
 
 
 ![](OutLoudFigure2.png)
+
 *Figure 2: Codebook generated from sync header of playlist `1Ws2L2kUi8Q5m0yn5lPLqK` with `SYNC_LENGTH = 12`*
 
 ### 3.2 Base-12 encoding
