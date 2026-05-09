@@ -190,15 +190,15 @@ See _Figure 1_ above.
 
 **Comparison across different bases:**
 
-| SYNC_LENGTH | Tracks per char | 5-char message | Max capacity* | Looks natural? |
-|-------------|-----------------|----------------|---------------|----------------|
-| 4           | 4               | 20 tracks      | ~2,499 chars  | ✓ very small   |
-| 8           | 3               | 15 tracks      | ~3,330 chars  | ✓ small        |
-| 12          | 2               | 10 tracks      | ~4,994 chars  | ✓ normal       |
-| 16          | 2               | 10 tracks      | ~4,992 chars  | ✓ normal       |
-| 32          | 2               | 10 tracks      | ~4,984 chars  | ~ large        |
-| 64          | 2               | 10 tracks      | ~4,968 chars  | ✗ suspicious   |
-| 128         | 1               | 5 tracks       | ~9,872 chars  | ✗ very large   |
+| SYNC_LENGTH | Tracks per char | 5-char message | Max capacity* |
+|-------------|-----------------|----------------|---------------|
+| 4           | 4               | 20 tracks      | ~2,499 chars  |
+| 8           | 3               | 15 tracks      | ~3,330 chars  |
+| 12          | 2               | 10 tracks      | ~4,994 chars  |
+| 16          | 2               | 10 tracks      | ~4,992 chars  |
+| 32          | 2               | 10 tracks      | ~4,984 chars  |
+| 64          | 2               | 10 tracks      | ~4,968 chars  |
+| 128         | 1               | 5 tracks       | ~9,872 chars  |
 
 *\*Based on Spotify's 10,000 track playlist limit, minus sync header tracks.* [12]
 
