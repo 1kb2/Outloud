@@ -364,7 +364,7 @@ At normal evasion intervals, a 100-character message takes approximately 18 minu
 The human-mimicking delays used in Outloud's normal operation are therefore a conservative evasion measure rather than a technical necessity. Spotify does not enforce explicit rate limits on playlist modification operations via the internal GraphQL API, the only observed limit is a silent IP-level connection block after sustained aggressive usage.
 
 The rate limiting test script is available at: 
-[github.com/1kb2/outloud/ratelimit_test.py](https://github.com/1kb2/outloud)
+[ratelimit_test.py](https://github.com/1kb2/Outloud/blob/main/ratelimit_test.py)
 
 ---
 
