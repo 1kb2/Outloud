@@ -122,12 +122,10 @@ The sync header serves two purposes. First it establishes the encoding alphabet 
 Below is an example playlist with `SYNC_LENGTH = 12`, and the resulting codebook  generated from its sync header:
 
 ![Playlist sync header example](OutLoudFigure1.png)
-
 *Figure 1: Playlist viewed in Spotify — first 12 tracks form the sync header, subsequent tracks encode the message.*
 
 
 ![](OutLoudFigure2.png)
-
 *Figure 2: Codebook generated from sync header of playlist `1Ws2L2kUi8Q5m0yn5lPLqK` with `SYNC_LENGTH = 12`*
 
 ### 3.2 Base-12 encoding
@@ -190,23 +188,23 @@ See _Figure 1_ above.
 
 **Comparison across different bases:**
 
-| SYNC_LENGTH | Tracks per char | 5-char message | Max capacity* |
-|-------------|-----------------|----------------|---------------|
-| 4           | 4               | 20 tracks      | ~2,499 chars  |
-| 8           | 3               | 15 tracks      | ~3,330 chars  |
-| 12          | 2               | 10 tracks      | ~4,994 chars  |
-| 16          | 2               | 10 tracks      | ~4,992 chars  |
-| 32          | 2               | 10 tracks      | ~4,984 chars  |
-| 64          | 2               | 10 tracks      | ~4,968 chars  |
-| 128         | 1               | 5 tracks       | ~9,872 chars  |
+| SYNC_LENGTH | Tracks per char | 5-char message | Max capacity* | Looks natural? |
+|-------------|-----------------|----------------|---------------|----------------|
+| 4           | 4               | 20 tracks      | ~2,499 chars  | ✓ very small   |
+| 8           | 3               | 15 tracks      | ~3,330 chars  | ✓ small        |
+| 12          | 2               | 10 tracks      | ~4,994 chars  | ✓ normal       |
+| 16          | 2               | 10 tracks      | ~4,992 chars  | ✓ normal       |
+| 32          | 2               | 10 tracks      | ~4,984 chars  | ~ large        |
+| 64          | 2               | 10 tracks      | ~4,968 chars  | ✗ suspicious   |
+| 128         | 1               | 5 tracks       | ~9,872 chars  | ✗ very large   |
 
 *\*Based on Spotify's 10,000 track playlist limit, minus sync header tracks.* [12]
 
 
 **Limitations:**
 
-- **ASCII only:** the current implementation supports standard ASCII (0–127).  Extended character sets such as UTF-8 would require either a larger base or  more tracks per character.
-- **Playlist size cap:** Spotify limits playlists to 10,000 tracks [12], giving  a theoretical maximum message length of ~4,994 characters at base-12.
+- **ASCII only** — the current implementation supports standard ASCII (0–127).  Extended character sets such as UTF-8 would require either a larger base or  more tracks per character.
+- **Playlist size cap** — Spotify limits playlists to 10,000 tracks [12], giving  a theoretical maximum message length of ~4,994 characters at base-12.
 
 > Note: In the current PoC, all sync header tracks are sourced from a single album (Aphex Twin — Selected Ambient Works 85-92) for simplicity. In an operational deployment, tracks would be sourced from multiple artists and genres to better  resemble a genuine user-curated playlist.
 
@@ -240,31 +238,144 @@ Additionally, the ordering of tracks within the sync header itself acts as a sec
 
 ## 4.0 Implementation
 
-### 4.1 Receiver: zero-auth HTML meta tag scraping
-### 4.2 Sender: internal GraphQL API reverse engineering
-### 4.3 Human sleep intervals for evasion
+### 4.1 Receiver: Zero-Auth HTML Meta Tag Scraping
+
+The receiver requires no authentication whatsoever. Public Spotify playlist pages embed all track URIs in HTML meta tags using the Open Graph music protocol [5]. A simple HTTP GET request retrieves the full track listing:
+
+```python
+html = requests.get(f"https://open.spotify.com/playlist/{PLAYLIST_ID}").text
+tracks = re.findall(
+    r'music:song" content="https://open.spotify.com/track/([a-zA-Z0-9]+)"', 
+    html
+)
+```
+
+This returns an ordered list of track IDs. The first `SYNC_LENGTH` tracks form the codebook, everything after is decoded using the base-N scheme described in section 3.2.
+
+The receiver can be implemented as a standalone polling loop with no dependencies beyond Python's `requests` library, no Spotify account, no API key, no session tokens.
 
 ---
 
-## 5.0 Findings
+### 4.2 Sender: Internal GraphQL API Reverse Engineering
 
-### 5.1 Spotify embeds all track URIs in public HTML
-### 5.2 client-token is not account-bound
-### 5.3 Bearer token required for writes only
-### 5.4 No rate limiting observed during testing
+The sender requires a valid Spotify session to write to the playlist. Through intercepting the Spotify web player's network traffic, two undocumented GraphQL endpoints were identified at `api-partner.spotify.com/pathfinder/v2/query`:
+
+**Adding a track: `addToPlaylist`:**
+
+```python
+body = {
+    "variables": {
+        "playlistItemUris": [track_uri],
+        "playlistUri": f"spotify:playlist:{playlist_id}",
+        "newPosition": {"moveType": "BOTTOM_OF_PLAYLIST", "fromUid": None},
+    },
+    "operationName": "addToPlaylist",
+    "extensions": {
+        "persistedQuery": {
+            "version": 1, 
+            "sha256Hash": "47b2a1234b17748d332dd0431534f22450e9ecbb3d5ddcdacbd83368636a0990"
+        }
+    },
+}
+```
+
+**Removing a track:`removeFromPlaylist`:**
+
+```python
+body = {
+    "variables": {
+        "playlistUri": f"spotify:playlist:{playlist_id}",
+        "uids": [uid],
+    },
+    "operationName": "removeFromPlaylist",
+    "extensions": {
+        "persistedQuery": {
+            "version": 1, 
+            "sha256Hash": "47b2a1234b17748d332dd0431534f22450e9ecbb3d5ddcdacbd83368636a0990"
+        }
+    },
+}
+```
+
+Both operations use the same persisted query hash and require two authentication headers:
+
+- **`client-token`:** a session token issued to any browser visiting `open.spotify.com`.
+- **`authorization: Bearer <token>`:**  an OAuth access token tied to the logged-in user's session, required for write operations.
+
+Both tokens were extracted directly from browser DevTools by inspecting the request headers of the Spotify web player's own API calls. No official Spotify developer account or registered application was used at any point.
+
+**Key finding:** the `removeFromPlaylist` operation requires a per-instance `uid` rather than a track URI. Each track in a playlist has a unique `uid` assigned at insertion time, meaning the same track added twice has two different UIDs. This required a separate `fetchPlaylistContents` query to retrieve UIDs before removal.
 
 ---
 
-## 6.0 Detection, Mitigation & Expansion
+### 4.3 Human Sleep Intervals for Evasion and Rate Limiting
 
-### 6.1 Blue Team Perspective
+To avoid triggering behavioral anomaly detection, the sender introduces randomized delays between each track addition:
+
+```python
+time.sleep(random.uniform(3, 8))
+```
+
+This produces intervals of 3 to 8 seconds between API calls, mimicking the natural pace of a user manually adding songs to a playlist. For track removal during the `clear_messages` operation, a slightly shorter interval is used:
+
+```python
+time.sleep(random.uniform(2, 5))
+```
+
+This reflects the faster pace at which users typically remove unwanted tracks compared to browsing and adding new ones.
+
+**Rate limiting observations:**
+
+To determine whether these delays are a technical necessity or purely an evasion measure, a series of rate limiting tests were conducted against Spotify's internal GraphQL API at progressively faster intervals:
+
+| Test | Operation | Requests | Successful | Failed | Interval  | Total time |
+|------|-----------|----------|------------|--------|-----------|------------|
+| 1    | Add       | 200      | 200        | 0      | 0.5–1.0s  | 220.5s     |
+| 1    | Remove    | 189      | 189        | 0      | 0.5–1.0s  | 215.6s     |
+| 2    | Add       | 1000     | 1000       | 0      | 0.3–0.7s  | ~900s      |
+| 2    | Remove    | 1000     | 1000       | 0      | 0.3–0.7s  | 870.6s     |
+| 3    | Add       | 5000     | 4235       | 1*     | 0.3–0.5s  | ~1690s     |
+
+> At request 4,236 of 5,000, the API became unresponsive, the connection hung indefinitely at the TLS handshake without returning any HTTP response, including no 429 (Too Many Requests).
+
+Across all three tests, 6,624 API requests completed successfully with no explicit rate limiting, throttling, CAPTCHA, or error responses observed.
+
+**Silent IP-level blocking:**
+
+Following the connection drop at request 4,236, all subsequent connection attempts from the same IP address failed at the TLS handshake level. However, connections from a different IP address via VPN remained functional, confirming the throttling mechanism operates at the IP level rather than the account level. Normal connectivity from the original IP resumed after approximately 1 hour.
+
+This has two implications for Outloud's operational viability:
+
+- The silent block threshold (~4,200 requests at aggressive intervals) is far beyond any realistic operational usage. Encoding a 500-character message requires only 1,000 API calls.
+- If the block is triggered, switching IP addresses immediately restores functionality since the account itself remains unaffected.
+
+**Data transmission capacity:**
+
+| Mode                  | Interval    | Throughput       |
+|-----------------------|-------------|------------------|
+| Normal (evasion)      | 3–8s        | ~5.5 chars/min   |
+| Fast                  | 0.5–1.0s    | ~27 chars/min    |
+| Aggressive            | 0.3–0.5s    | ~75 chars/min    |
+
+At normal evasion intervals, a 100-character message takes approximately 18 minutes to transmit, slow by conventional standards, but consistent with the channel's design goal of stealth over speed.
+
+The human-mimicking delays used in Outloud's normal operation are therefore a conservative evasion measure rather than a technical necessity. Spotify does not enforce explicit rate limits on playlist modification operations via the internal GraphQL API, the only observed limit is a silent IP-level connection block after sustained aggressive usage.
+
+The rate limiting test script is available at: 
+[github.com/1kb2/outloud/ratelimit_test.py](https://github.com/1kb2/outloud)
+
+---
+
+## 5.0 Detection, Mitigation & Expansion
+
+### 5.1 Blue Team Perspective
 
 - What does Outloud traffic look like from a defender's point of view
 - Does it appear in proxy/firewall logs
 - Is the playlist fetch distinguishable from normal Spotify usage
 - What artifacts does the sender leave behind
 
-### 6.2 What Would Trigger a SIEM
+### 5.2 What Would Trigger a SIEM
 
 - Behavioral indicators — repeated playlist fetches at regular intervals
 - Volume anomalies — unusually frequent calls to open.spotify.com
@@ -272,14 +383,14 @@ Additionally, the ordering of tracks within the sync header itself acts as a sec
 - Correlation rules that could catch the pattern
 - Why most SIEMs would miss this entirely
 
-### 6.3 How Spotify Could Detect/Prevent This
+### 5.3 How Spotify Could Detect/Prevent This
 
 - Rate limiting track additions per session
 - Anomaly detection on playlist modification frequency
 - Flagging playlists where tracks are added and removed in rapid succession
 - Whether Open Graph meta tags could be gated behind auth
 
-### 6.4 Red Team Expansion
+### 5.4 Red Team Expansion
 
 - Using Outloud as a dead drop for operator instructions
 - Fileless persistence integration
@@ -288,8 +399,7 @@ Additionally, the ordering of tracks within the sync header itself acts as a sec
 - Detection evasion beyond human sleep intervals
 
 ---
-
-## 7.0 Conclusion
+## 6.0 Conclusion
 
 ---
 
