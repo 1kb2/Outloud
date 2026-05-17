@@ -340,11 +340,11 @@ To determine whether these delays are a technical necessity or purely an evasion
 
 > At request 4,236 of 5,000, the API became unresponsive, the connection hung indefinitely at the TLS handshake without returning any HTTP response, including no 429 (Too Many Requests).
 
-Across all three tests, 6,624 API requests completed successfully with no explicit rate limiting, throttling, CAPTCHA, or error responses observed.
+Across all three tests, 6,624 API requests completed successfully. No explicit rate limiting responses (HTTP 429) were ever returned by the API. However, at request 4,236 during test 3, a silent blocking mechanism was triggered.
 
 **Silent IP-level blocking:**
 
-Following the connection drop at request 4,236, all subsequent connection attempts from the same IP address failed at the TLS handshake level. However, connections from a different IP address via VPN remained functional, confirming the throttling mechanism operates at the IP level rather than the account level. Normal connectivity from the original IP resumed after approximately 1 hour.
+Rather than returning an error response, Spotify's infrastructure silently dropped all further connections from the originating IP address at the TLS handshake level. Connections from a different IP address via VPN remained functional, confirming the throttling mechanism operates at the IP level rather than the account level. Normal connectivity from the original IP resumed after approximately 1 hour.
 
 This has two implications for Outloud's operational viability:
 
