@@ -1,6 +1,6 @@
 # OutLoud
 
-A steganographic data transmission system exploiting Spotify playlist track ordering
+Exploring steganography through a covert channel built on Spotify playlist track ordering.
 
 ---
 
