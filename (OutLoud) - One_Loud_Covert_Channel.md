@@ -4,16 +4,6 @@ A steganographic data transmission system exploiting Spotify playlist track orde
 
 ---
 
-**Contributors**
-
-| Handle | Role                                |
-| ------ | ----------------------------------- |
-| - | - |
-| - | - |
-| - | - |
-
----
-
 ## 1.0 Abstract
 
 ### 1.1 Overview
