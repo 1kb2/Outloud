@@ -360,7 +360,7 @@ The rate limiting test script is available at:
 
 ## 5.0 Conclusion
 
-Outloud demonstrates that a fully functional covert communication channel can be constructed using nothing more than the public features of a mainstream music streaming platform. No vulnerabilities were leveraged, no security controls were bypassed, and no malicious content was stored at any point, the channel operates entirely within the boundaries of normal platform usage.
+Outloud demonstrates that a fully functional covert communication channel can be constructed using nothing more than the public features of a mainstream music streaming platform. No vulnerabilities were exploited, no security controls were bypassed, and no malicious content was stored at any point, the channel operates entirely within the boundaries of normal platform usage.
 
 The key findings of this research are:
 
