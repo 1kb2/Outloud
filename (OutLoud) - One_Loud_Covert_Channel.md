@@ -271,7 +271,7 @@ body = {
 }
 ```
 
-**Removing a track:`removeFromPlaylist`:**
+**Removing a track: `removeFromPlaylist`:**
 
 ```python
 body = {
