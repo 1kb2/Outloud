@@ -1,0 +1,32 @@
+
+# 5.0 Detection, Mitigation & Expansion
+
+## 5.1 Blue Team Perspective
+
+- What does Outloud traffic look like from a defender's point of view
+- Does it appear in proxy/firewall logs
+- Is the playlist fetch distinguishable from normal Spotify usage
+- What artifacts does the sender leave behind
+
+## 5.2 What Would Trigger a SIEM
+
+- Behavioral indicators — repeated playlist fetches at regular intervals
+- Volume anomalies — unusually frequent calls to open.spotify.com
+- Process anomalies — non-browser processes making requests to Spotify
+- Correlation rules that could catch the pattern
+- Why most SIEMs would miss this entirely
+
+## 5.3 How Spotify Could Detect/Prevent This
+
+- Rate limiting track additions per session
+- Anomaly detection on playlist modification frequency
+- Flagging playlists where tracks are added and removed in rapid succession
+- Whether Open Graph meta tags could be gated behind auth
+
+## 5.4 Red Team Expansion
+
+- Using Outloud as a dead drop for operator instructions
+- Fileless persistence integration
+- Polling loop implementation for autonomous receiver
+- Operational security considerations
+- Detection evasion beyond human sleep intervals
