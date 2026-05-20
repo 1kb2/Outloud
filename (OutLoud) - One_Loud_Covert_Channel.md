@@ -370,32 +370,18 @@ The rate limiting test script is available at:
 
 ## 5.0 Conclusion
 
-Outloud demonstrates that a fully functional covert communication channel 
-can be constructed using nothing more than the public features of a mainstream 
-music streaming platform. No vulnerabilities were exploited, no security 
-controls were bypassed, and no malicious content was stored at any point — 
-the channel operates entirely within the boundaries of normal platform usage.
+Outloud demonstrates that a fully functional covert communication channel can be constructed using nothing more than the public features of a mainstream music streaming platform. No vulnerabilities were exploited, no security controls were bypassed, and no malicious content was stored at any point, the channel operates entirely within the boundaries of normal platform usage.
 
 The key findings of this research are:
 
-- A receiver can decode messages from a public Spotify playlist with zero 
-  authentication, using only the HTML meta tags Spotify exposes for social 
-  sharing.
-- Spotify's internal GraphQL API accepts automated playlist modifications 
-  at scale, with no explicit rate limiting observed across 6,624 successful 
-  requests. A silent IP-level block was triggered only after ~4,235 
-  consecutive requests at aggressive intervals.
-- The shared secret between sender and receiver is a single integer — the 
-  sync length — making the channel trivial to establish and difficult to 
-  detect without prior knowledge of its existence.
+- A receiver can decode messages from a public Spotify playlist with zero authentication, using only the HTML meta tags Spotify exposes for social sharing.
+- Spotify's internal GraphQL API accepts automated playlist modifications at scale, with no explicit rate limiting observed across 6,624 successful requests. A silent IP-level block was triggered only after ~4,235 consecutive requests at aggressive intervals.
+- The shared secret between sender and receiver is a single integer, the sync length — making the channel trivial to establish and difficult to detect without prior knowledge of its existence.
 
-Outloud is not unique to Spotify. Any platform that exposes ordered, publicly 
-readable data and allows authenticated modifications is a potential candidate 
-for a similar channel. The methodology described in this paper is 
-platform-agnostic — only the implementation details change.
+Outloud is not unique to Spotify. Any platform that exposes ordered, publicly readable data and allows authenticated modifications is a potential candidate for a similar channel. The methodology described in this paper is platform-agnostic, only the implementation details change.
 
 The tool and all supporting code are available at: 
-[github.com/1kb2/outloud](https://github.com/1kb2/outloud)
+[github.com/1kb2/outloud](https://github.com/1kb2/outloud) 
 
 ## What's Next
 
@@ -405,8 +391,9 @@ The tool and all supporting code are available at:
   engineering
 - **Beyond Spotify** — applying the methodology to other platforms
 
-Follow this series at [1kb2.xyz](https://1kb2.xyz)
+Follow this series at [1kb2.xyz](https://1kb2.xyz) 
 
+⭐ Drop a star on the [repo](https://github.com/1kb2/outloud) if you enjoyed reading this :)
 ---
 
 ## References
