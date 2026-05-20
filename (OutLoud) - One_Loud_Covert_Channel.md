@@ -84,7 +84,7 @@ Implementations vary widely. Common examples include:
 - LSB image embedding conceals data in the least significant bits of pixel values in PNG and JPEG files [9]. 
 - Echo audio steganography embeds data into audio signals by varying the amplitude, decay rate, and offset of introduced echoes [10]. 
 
-**Web service abuse** (MITRE ATT&CK T1102 [11]) stores malicious payloads directly on legitimate platforms such as Dropbox, GitHub, or Pastebin. While these blend into normal traffic due to the legitimacy of the hosting platform, the payload itself remains detectable through content inspection.
+**Web service abuse** [11] stores malicious payloads directly on legitimate platforms such as Dropbox, GitHub, or Pastebin. While these blend into normal traffic due to the legitimacy of the hosting platform, the payload itself remains detectable through content inspection.
 
 Outloud differs fundamentally from all of the above, no malicious content is stored anywhere. The message exists only in the semantic ordering of tracks within a normal music playlist, invisible to any content-based detection.
 
