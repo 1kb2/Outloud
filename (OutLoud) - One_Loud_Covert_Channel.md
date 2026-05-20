@@ -11,7 +11,7 @@ Exploring steganography through a covert channel built on Spotify playlist track
 Outloud is a Proof-of-Concept (PoC) covert channel that encodes arbitrary text 
 messages into the ordering of tracks within a public Spotify playlist.
 
-By exploiting the fact that Spotify embeds all playlist track URIs in publicly 
+By leveraging the fact that Spotify embeds all playlist track URIs in publicly 
 accessible HTML meta tags, a receiver requires no authentication whatsoever to 
 decode messages. The sender encodes data using a `base-N positional encoding scheme`  where the first N tracks define a dynamic codebook, and subsequent tracks represent encoded characters.
 
@@ -29,7 +29,7 @@ Follow this and additional works at: https://1kb2.xyz
 
 **Covert channels** [1] enable secret data transmission through legitimate system resources or protocols, evading detection by hiding communication within normal operations. They fall into:
 * **Timing channels** [2], like inter-packet delays.
-* **Storage channels** [3], like modifying packet headers or in our case exploiting Spotify playlist track ordering.
+* **Storage channels** [3], like modifying packet headers or in our case leveraging Spotify playlist track ordering.
 
 ---
 
@@ -78,7 +78,7 @@ Covert channels are classified into two fundamental categories: storage channels
 
 Implementations vary widely. Common examples include:
 
-**Network protocol channels** exploit the structure of network protocols to hide data. During the SolarWinds compromise (attributed to APT29/SVR), attackers used DNS subdomain encoding to construct randomized subdomains for C2 communication [7]. Similarly, the Ke3chang/APT15 group's Okrum backdoor employed custom HTTP header steganography using `Cookie` and `Set-Cookie` fields for C2 [8]. 
+**Network protocol channels** leverage the structure of network protocols to hide data. During the SolarWinds compromise (attributed to APT29/SVR), attackers used DNS subdomain encoding to construct randomized subdomains for C2 communication [7]. Similarly, the Ke3chang/APT15 group's Okrum backdoor employed custom HTTP header steganography using `Cookie` and `Set-Cookie` fields for C2 [8]. 
 
 **Media steganography** hides data within innocent-looking files. 
 - LSB image embedding conceals data in the least significant bits of pixel values in PNG and JPEG files [9]. 
@@ -360,7 +360,7 @@ The rate limiting test script is available at:
 
 ## 5.0 Conclusion
 
-Outloud demonstrates that a fully functional covert communication channel can be constructed using nothing more than the public features of a mainstream music streaming platform. No vulnerabilities were exploited, no security controls were bypassed, and no malicious content was stored at any point, the channel operates entirely within the boundaries of normal platform usage.
+Outloud demonstrates that a fully functional covert communication channel can be constructed using nothing more than the public features of a mainstream music streaming platform. No vulnerabilities were leveraged, no security controls were bypassed, and no malicious content was stored at any point, the channel operates entirely within the boundaries of normal platform usage.
 
 The key findings of this research are:
 
