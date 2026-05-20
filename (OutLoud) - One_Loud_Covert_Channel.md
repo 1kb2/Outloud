@@ -69,7 +69,7 @@ As Bruce Schneier noted:
 
 > "Security through obscurity is no security at all." [6]
 
-This distinction is critical for Outloud. The channel itself provides no confidentiality if an adversary discovers the playlist and knows the sync length, they can decode any message trivially. For operational security, plaintext messages should be encrypted before encoding into the playlist. Outloud provides *covertness*, not *confidentiality*, these properties should not be conflated.
+This distinction is critical for Outloud. The channel itself provides no confidentiality, if an adversary discovers the playlist and knows the sync length, they can decode any message trivially. For operational security, plaintext messages should be encrypted before encoding into the playlist. Outloud provides *covertness*, not *confidentiality*, these properties should not be conflated.
 
 
 ### 2.2 Existing covert channels 
@@ -232,7 +232,7 @@ Additionally, the ordering of tracks within the sync header itself acts as a sec
 
 ### 4.1 Receiver: Zero-Auth HTML Meta Tag Scraping
 
-The receiver requires no authentication whatsoever. Public Spotify playlist pages embed all track URIs in HTML meta tags using the Open Graph music protocol [5]. A simple HTTP GET request retrieves the full track listing:
+The receiver requires no authentication whatsoever. Public Spotify playlist pages embed all track URIs in HTML meta tags using the Open Graph music protocol. A simple HTTP GET request retrieves the full track listing:
 
 ```python
 html = requests.get(f"https://open.spotify.com/playlist/{PLAYLIST_ID}").text
@@ -346,8 +346,8 @@ This has two implications for Outloud's operational viability:
 | Mode                  | Interval    | Throughput       |
 |-----------------------|-------------|------------------|
 | Normal (evasion)      | 3–8s        | ~5.5 chars/min   |
-| Fast                  | 0.5–1.0s    | ~27 chars/min    |
-| Aggressive            | 0.3–0.5s    | ~75 chars/min    |
+| Fast (test 1)         | 0.5–1.0s    | ~27 chars/min    |
+| Aggressive (test 2)   | 0.3–0.7s    | ~33 chars/min    |
 
 At normal evasion intervals, a 100-character message takes approximately 18 minutes to transmit, slow by conventional standards, but consistent with the channel's design goal of stealth over speed.
 
