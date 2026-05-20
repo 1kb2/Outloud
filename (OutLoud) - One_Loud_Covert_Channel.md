@@ -368,40 +368,44 @@ The rate limiting test script is available at:
 
 ---
 
-## 5.0 Detection, Mitigation & Expansion
+## 5.0 Conclusion
 
-### 5.1 Blue Team Perspective
+Outloud demonstrates that a fully functional covert communication channel 
+can be constructed using nothing more than the public features of a mainstream 
+music streaming platform. No vulnerabilities were exploited, no security 
+controls were bypassed, and no malicious content was stored at any point — 
+the channel operates entirely within the boundaries of normal platform usage.
 
-- What does Outloud traffic look like from a defender's point of view
-- Does it appear in proxy/firewall logs
-- Is the playlist fetch distinguishable from normal Spotify usage
-- What artifacts does the sender leave behind
+The key findings of this research are:
 
-### 5.2 What Would Trigger a SIEM
+- A receiver can decode messages from a public Spotify playlist with zero 
+  authentication, using only the HTML meta tags Spotify exposes for social 
+  sharing.
+- Spotify's internal GraphQL API accepts automated playlist modifications 
+  at scale, with no explicit rate limiting observed across 6,624 successful 
+  requests. A silent IP-level block was triggered only after ~4,235 
+  consecutive requests at aggressive intervals.
+- The shared secret between sender and receiver is a single integer — the 
+  sync length — making the channel trivial to establish and difficult to 
+  detect without prior knowledge of its existence.
 
-- Behavioral indicators — repeated playlist fetches at regular intervals
-- Volume anomalies — unusually frequent calls to open.spotify.com
-- Process anomalies — non-browser processes making requests to Spotify
-- Correlation rules that could catch the pattern
-- Why most SIEMs would miss this entirely
+Outloud is not unique to Spotify. Any platform that exposes ordered, publicly 
+readable data and allows authenticated modifications is a potential candidate 
+for a similar channel. The methodology described in this paper is 
+platform-agnostic — only the implementation details change.
 
-### 5.3 How Spotify Could Detect/Prevent This
+The tool and all supporting code are available at: 
+[github.com/1kb2/outloud](https://github.com/1kb2/outloud)
 
-- Rate limiting track additions per session
-- Anomaly detection on playlist modification frequency
-- Flagging playlists where tracks are added and removed in rapid succession
-- Whether Open Graph meta tags could be gated behind auth
+## What's Next
 
-### 5.4 Red Team Expansion
+- **Weaponizing Outloud** — integrating the channel into an offensive 
+  toolchain
+- **Detecting Outloud** — blue team analysis, SIEM rules, and detection 
+  engineering
+- **Beyond Spotify** — applying the methodology to other platforms
 
-- Using Outloud as a dead drop for operator instructions
-- Fileless persistence integration
-- Polling loop implementation for autonomous receiver
-- Operational security considerations
-- Detection evasion beyond human sleep intervals
-
----
-## 6.0 Conclusion
+Follow this series at [1kb2.xyz](https://1kb2.xyz)
 
 ---
 
